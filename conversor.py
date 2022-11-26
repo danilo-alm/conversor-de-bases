@@ -57,7 +57,7 @@ def x_para_decimal(base_origem: int, numero: str) -> float:
     for index, char in enumerate(chars_inteiro):
         if char.isalpha():
             chars_inteiro[index] = letras[char]    
-    for index, num in enumerate(chars_inteiro):
+    for index, num in enumerate(chars_inteiro[::-1]):
         resultado_inteiro += base_origem ** index * int(num)
     
     # Parte Decimal
@@ -73,6 +73,9 @@ def x_para_decimal(base_origem: int, numero: str) -> float:
 def decimal_para_x(base_destino: int, numero: float):
     ''' Retorna o decimal na base x '''
 
+    if base_destino == 10:
+        return numero
+
     inteiro, decimal = separar_inteiro_e_decimal(numero)
     resultado_inteiro, resultado_decimal = list(), list()
     
@@ -83,17 +86,16 @@ def decimal_para_x(base_destino: int, numero: float):
         resultado_inteiro = ( resultado_inteiro + [inteiro] )[::-1]
     
     if decimal > 0:
-        # 345 -> 0.345
-        decimal = decimal / 10 ** contar_digitos(decimal)
+        digitos = 0
         last_result = None
-        while decimal != 0:
+        while decimal > 0 and digitos < 20:
             decimal *= base_destino
-            if decimal >= 1:
-                if decimal == last_result:
-                    break
-                last_result = decimal
-                resultado_decimal.append( int(decimal) )
-                decimal = decimal - int(decimal)
+            if decimal == last_result:
+                break
+            last_result = decimal
+            resultado_decimal.append( int(decimal) )
+            decimal = decimal - int(decimal)
+            digitos += 1
 
     for resultado in (resultado_inteiro, resultado_decimal):
         for index, num in enumerate(resultado):
@@ -117,14 +119,16 @@ numeros = {
 }
 
 def main():
-    base_origem = round( float(coletar_e_validar_input('Base de Origem: ')) )
-    numero = coletar_e_validar_input('Número: ', base_origem )
-    base_destino = round( float(coletar_e_validar_input('Base de Destino: ')) )
+    while True:
+        base_origem = round( float(coletar_e_validar_input('Base de Origem: ')) )
+        numero = coletar_e_validar_input('Número: ', base_origem )
+        base_destino = round( float(coletar_e_validar_input('Base de Destino: ')) )
 
-    if base_origem != 10:
-        numero = x_para_decimal(base_origem, numero)
+        if base_origem != 10:
+            numero = x_para_decimal(base_origem, numero)
 
-    print(decimal_para_x(base_destino, numero))
+        resultado = decimal_para_x(base_destino, float(numero) )
+        print(f'Resultado: {resultado}\n')
 
 if __name__ == '__main__':
     try:
