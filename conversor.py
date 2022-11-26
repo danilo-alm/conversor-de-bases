@@ -14,18 +14,24 @@ def coletar_e_validar_input(mensagem, base=10):
                 return inp
         print('Número Inválido!')
 
-def separar_inteiro_e_decimal(num: str):
-    ''' 12.234 -> ([1,2], [2,3,4]) '''
-    ponto_index = num.find('.')
-    decimal = (False if ponto_index == -1 else True)
-    chars_decimal = list()
+def separar_inteiro_e_decimal(num: str or float) -> tuple:
+    ''' 12.234 -> (12, 234) '''
     
-    if decimal:
-        chars_inteiro = list(num[:ponto_index])
-        chars_decimal = list(num[ponto_index+1:])
+    if isinstance(num, str):
+        ponto_index = num.find('.')
+        decimal = (False if ponto_index == -1 else True)
+
+        if decimal:
+            inteiro = num[:ponto_index]
+            decimal = num[ponto_index+1:]
+        else:
+            inteiro = num
+        inteiro = '' if inteiro is False else inteiro
+        decimal = '' if decimal is False else decimal
     else:
-        chars_inteiro = list(num)
-    return (chars_inteiro, chars_decimal)
+        inteiro = int(num)
+        decimal = num % 1
+    return (inteiro, decimal)
 
 def contar_digitos(num: int):
     ''' Retorna quantidade de dígitos em um inteiro '''
@@ -34,11 +40,12 @@ def contar_digitos(num: int):
         num //= 10
         contagem += 1
     return contagem
-        
-def x_para_decimal(base_origem: int, numero: str) -> int:
+
+def x_para_decimal(base_origem: int, numero: str) -> float:
     ''' Retorna o número na base 10 '''
     
-    chars_inteiro, chars_decimal = separar_inteiro_e_decimal(numero)
+    inteiro, decimal = separar_inteiro_e_decimal(numero)
+    chars_inteiro, chars_decimal = list(inteiro), list(decimal)
     resultado_inteiro, resultado_decimal = 0, 0
     
     ''' 
@@ -63,24 +70,21 @@ def x_para_decimal(base_origem: int, numero: str) -> int:
     
     return resultado_inteiro + resultado_decimal
 
-def decimal_para_x(base_destino, numero):
+def decimal_para_x(base_destino: int, numero: float):
     ''' Retorna o decimal na base x '''
 
-    chars_inteiro, chars_decimal = separar_inteiro_e_decimal(numero)
-    inteiro = ''.join(chars_inteiro)
-    decimal = ''.join(chars_decimal)
-
+    inteiro, decimal = separar_inteiro_e_decimal(numero)
     resultado_inteiro, resultado_decimal = list(), list()
     
-    if inteiro != '':
-        inteiro = int(inteiro)
+    if inteiro > 0:
         while inteiro >= base_destino:
             resultado_inteiro.append( inteiro % base_destino )
             inteiro //= base_destino
         resultado_inteiro = ( resultado_inteiro + [inteiro] )[::-1]
     
-    if decimal != '':
-        decimal = float('.' + decimal)
+    if decimal > 0:
+        # 345 -> 0.345
+        decimal = decimal / 10 ** contar_digitos(decimal)
         last_result = None
         while decimal != 0:
             decimal *= base_destino
