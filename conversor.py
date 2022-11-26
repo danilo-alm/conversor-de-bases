@@ -33,14 +33,6 @@ def separar_inteiro_e_decimal(num: str or float) -> tuple:
         decimal = num % 1
     return (inteiro, decimal)
 
-def contar_digitos(num: int):
-    ''' Retorna quantidade de dígitos em um inteiro '''
-    contagem = 0
-    while num > 0:
-        num //= 10
-        contagem += 1
-    return contagem
-
 def x_para_decimal(base_origem: int, numero: str) -> float:
     ''' Retorna o número na base 10 '''
     
